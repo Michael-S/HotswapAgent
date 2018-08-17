@@ -249,6 +249,20 @@ public class AnonymousClassInfos {
 
     // get timestamp on the main class file
     private long lastModified(ClassPool classPool, String className) {
+        // the line String file = classPool.find(className).getFile(); was throwing
+        // a null pointer exception.  I've added these lines to collect more useful information.
+        // I've preserved the NullPointerException to avoid introducing new unexpected behavior.
+        if (classPool == null) {
+            if (className == null) {
+                throw new NullPointerException("lastModified received null classPool and className input!");
+            } else {
+                throw new NullPointerException("Unexpected null classPool input.");
+            }
+        } else if (className == null) {
+            throw new NullPointerException("lastModified received null className input.");
+        } else if (classPool.find(className) == null) {
+            throw new NullPointerException("lastModified, classPool " + classPool + " .find(" + className + ") found nothing.");
+        }
         String file = classPool.find(className).getFile();
         return new File(file).lastModified();
     }
